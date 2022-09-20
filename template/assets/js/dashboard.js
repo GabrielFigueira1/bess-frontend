@@ -50,8 +50,8 @@ if ($("#ocv-graph").length) {
 			fill: true,
 			pointBorderColor: "#fff",
 			pointBackgroundColor: "#3dd597",
-			pointBorderWidth: 2,
-			pointRadius: 4,
+			pointBorderWidth: 1,
+			pointRadius: 3,
 		}
 			/*,
 			{
@@ -95,7 +95,7 @@ if ($("#ocv-graph").length) {
 				position: 'bottom',
 				gridLines: {
 					drawBorder: false,
-					display: false,
+					display: true,
 					drawTicks: false,
 				},
 				ticks: {
@@ -163,8 +163,8 @@ if ($("#SOC-graph").length) {
 			fill: true,
 			pointBorderColor: "#fff",
 			pointBackgroundColor: "#3dd597",
-			pointBorderWidth: 2,
-			pointRadius: 4,
+			pointBorderWidth: 1,
+			pointRadius: 3,
 		}
 		],
 	};
@@ -191,7 +191,7 @@ if ($("#SOC-graph").length) {
 				position: 'bottom',
 				gridLines: {
 					drawBorder: false,
-					display: false,
+					display: true,
 					drawTicks: false,
 				},
 				ticks: {
@@ -258,8 +258,8 @@ if ($("#current-graph").length) {
 			fill: true,
 			pointBorderColor: "#fff",
 			pointBackgroundColor: "#3dd597",
-			pointBorderWidth: 2,
-			pointRadius: 4,
+			pointBorderWidth: 1,
+			pointRadius: 3,
 		}
 		],
 	};
@@ -286,7 +286,7 @@ if ($("#current-graph").length) {
 				position: 'bottom',
 				gridLines: {
 					drawBorder: false,
-					display: false,
+					display: true,
 					drawTicks: false,
 				},
 				ticks: {
