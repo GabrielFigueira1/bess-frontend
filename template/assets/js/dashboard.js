@@ -1,45 +1,45 @@
-(function($) {
-	document.querySelector('#bannerClose').addEventListener('click',function() {
-		document.querySelector('#proBanner').classList.add('d-none');
-	});
-	'use strict';
-	$(function() {
-		//SOC
-		if ($(".dashboard-progress-1").length) {
-			$('.dashboard-progress-1').circleProgress({
-				value: 0.74,
-				size: 125,
-				thickness: 7,
-				startAngle: Math.PI * 3/2,
-				fill: {
-					gradient: ["#7922e5", "#1579ff"]
-				}
-			});
+
+//SOC
+if ($(".dashboard-progress-1").length) {
+	var socCircle = $('.dashboard-progress-1').circleProgress({
+		value: 0.74,
+		size: 125,
+		thickness: 7,
+		startAngle: Math.PI * 3 / 2,
+		fill: {
+			gradient: ["#7922e5", "#1579ff"]
 		}
-		//SOH
-		if ($(".dashboard-progress-2").length) {
-			$('.dashboard-progress-2').circleProgress({
-				value: 0.90,
-				size: 125,
-				thickness: 7,
-				startAngle: Math.PI * 3/2,
-				fill: {
-					gradient: ["#429321", "#b4ec51"]
-				}
-			});
-		}		
-    
 	});
-})(jQuery);
+}
+function UpdateSOCCircle(valuePercent){
+	socCircle.circleProgress('value', valuePercent/100);
+	document.getElementById("soc-circle").textContent = valuePercent.substring(0, 5) + "%";
+}
+//SOH
+if ($(".dashboard-progress-2").length) {
+	var sohCircle = $('.dashboard-progress-2').circleProgress({
+		value: 0.90,
+		size: 125,
+		thickness: 7,
+		startAngle: Math.PI * 3 / 2,
+		fill: {
+			gradient: ["#429321", "#b4ec51"]
+		}
+	});
+}
+function UpdateSOHCircle(valuePercent){
+	sohCircle.circleProgress('value', valuePercent/100);
+	document.getElementById("soh-circle").textContent = valuePercent.substring(0, 5) + "%";
+}
 
-
+//$('.dashboard-progress-1').circleProgress({value: 0.1})
 //OCV graph
 if ($("#ocv-graph").length) {
 	var pageiVewAnalyticDataOCV = {
-		labels: ["1", "2", "3", "4", "5", "6", "7"],
+		labels: [],
 		datasets: [{
 			label: 'OCV (V)',
-			data: [5, 4.8, 4.7, 4.4, 4.2, 4.1, 3.5],
+			data: [],
 			backgroundColor: [
 				'rgba(216,247,234, 0.19)',
 			],
@@ -50,8 +50,8 @@ if ($("#ocv-graph").length) {
 			fill: true,
 			pointBorderColor: "#fff",
 			pointBackgroundColor: "#3dd597",
-			pointBorderWidth: 1,
-			pointRadius: 3,
+			pointBorderWidth: 0,
+			pointRadius: 0,
 		}
 			/*,
 			{
@@ -149,10 +149,10 @@ if ($("#ocv-graph").length) {
 
 if ($("#SOC-graph").length) {
 	var pageiVewAnalyticDataSOC = {
-		labels: ["1", "2", "3", "4", "5", "6", "7"],
+		labels: [],
 		datasets: [{
 			label: 'SOC (%)',
-			data: [100, 97, 90, 74, 63, 50, 40],
+			data: [],
 			backgroundColor: [
 				'rgba(216,247,234, 0.19)',
 			],
@@ -163,8 +163,8 @@ if ($("#SOC-graph").length) {
 			fill: true,
 			pointBorderColor: "#fff",
 			pointBackgroundColor: "#3dd597",
-			pointBorderWidth: 1,
-			pointRadius: 3,
+			pointBorderWidth: 0,
+			pointRadius: 0,
 		}
 		],
 	};
@@ -232,22 +232,22 @@ if ($("#SOC-graph").length) {
 	};
 	var SOCCanvas = $("#SOC-graph").get(0).getContext("2d");
 	// This will get the first returned node in the jQuery collection.
-	var SOCChart = new Chart(SOCCanvas, {
+	var SOCGraph = new Chart(SOCCanvas, {
 		type: 'line',
 		data: pageiVewAnalyticDataSOC,
 		options: pageiVewAnalyticOptionsSOC,
 	});
-	document.getElementById('SOClegend').innerHTML = SOCChart.generateLegend();
+	document.getElementById('SOClegend').innerHTML = SOCGraph.generateLegend();
 }
 
 
 // Current graph
 if ($("#current-graph").length) {
 	var pageiVewAnalyticDataCurrent = {
-		labels: ["1", "2", "3", "4", "5", "6", "7"],
+		labels: [],
 		datasets: [{
 			label: 'SOC (%)',
-			data: [100, 97, 90, 74, 63, 50, 40],
+			data: [],
 			backgroundColor: [
 				'rgba(216,247,234, 0.19)',
 			],
@@ -258,8 +258,8 @@ if ($("#current-graph").length) {
 			fill: true,
 			pointBorderColor: "#fff",
 			pointBackgroundColor: "#3dd597",
-			pointBorderWidth: 1,
-			pointRadius: 3,
+			pointBorderWidth: 0,
+			pointRadius: 0,
 		}
 		],
 	};
@@ -276,9 +276,9 @@ if ($("#current-graph").length) {
 				},
 				ticks: {
 					beginAtZero: true,
-					stepSize: 10,
+					stepSize: 0.5,
 					display: true,
-					padding: 10,
+					padding: 1,
 				}
 			}],
 			xAxes: [{
@@ -335,11 +335,56 @@ if ($("#current-graph").length) {
 	document.getElementById('currentlegend').innerHTML = currentGraph.generateLegend();
 }
 
+// Dynamic data methods
 
 function UpdateOCVGraph(newValueX, newValueY) {
 	OCVGraph.data.labels.push(newValueX);
 	OCVGraph.data.datasets[0].data.push(newValueY)
-	OCVGraph.update()
+	OCVGraph.update();
+}
+
+function UpdateSOCGraph(newValueX, newValueY) {
+	SOCGraph.data.labels.push(newValueX);
+	SOCGraph.data.datasets[0].data.push(newValueY)
+	SOCGraph.update();
+}
+
+function UpdateCurrentGraph(newValueX, newValueY) {
+	currentGraph.data.labels.push(newValueX);
+	currentGraph.data.datasets[0].data.push(newValueY)
+	currentGraph.update();
+}
+
+function UpdateSOHData(SOHData){
+	UpdateSOHCircle(SOHData[SOHData.length - 1]);
+}
+
+// Graph data initalize methods
+function InitOCVData(OCVData, timestampArr){
+	OCVData.forEach((element, index) => {
+		OCVGraph.data.datasets[0].data.push(element);
+		pageiVewAnalyticDataOCV.labels.push(timestampArr[index]/1000);
+	});
+	OCVGraph.update();
+}
+
+function InitSOCData(SOCData, timestampArr){
+	SOCData.forEach((element, index) => {
+		SOCGraph.data.datasets[0].data.push(element);
+		pageiVewAnalyticDataSOC.labels.push(timestampArr[index]/1000);
+	});
+	UpdateSOCCircle(SOCData[SOCData.length - 1]);
+	SOCGraph.update();
+}
+
+
+
+function InitCurrentData(currentData, timestampArr){
+	currentData.forEach((element, index) => {
+		currentGraph.data.datasets[0].data.push(element);
+		pageiVewAnalyticDataCurrent.labels.push(timestampArr[index]/1000);
+	});
+	currentGraph.update();
 }
 
 
@@ -352,12 +397,33 @@ function UpdateOCVGraph(newValueX, newValueY) {
 
 var webSocket = new WebSocket("ws://localhost:3000/readLast");
 
-const server_URL = "http://localhost:3000/allData";
+const SERVER_URL = "http://localhost:3000/allData";
 
 //performs http request to get initial data
-fetch(server_URL)
+fetch(SERVER_URL)
 	.then(data => { return data.json() })
-	.then(res => { console.log(JSON.stringify(res)) })
+	.then(res => {
+		let timestampData = [];
+		timestampData = res.map((item) => item.timestamp);
+
+		let OCVData = [];
+		OCVData = res.map((item) => item.ocv);
+		InitOCVData(OCVData, timestampData);
+
+		let currentData = [];
+		currentData = res.map((item) => item.corrente);
+		InitCurrentData(currentData, timestampData);
+
+		let SOCData = [];
+		SOCData = res.map((item) => item.soc);
+		InitSOCData(SOCData, timestampData);
+
+		let SOHData = [];
+		SOHData = res.map((item) => item.soh);
+		UpdateSOHData(SOHData);
+
+		console.log(JSON.stringify(res));
+	})
 
 webSocket.onopen = (event) => {
 	var sendObject = { userName: "Dashboard", message: "Trying to connect" };
@@ -367,17 +433,17 @@ webSocket.onopen = (event) => {
 webSocket.onmessage = (event) => {
 	console.log(event.data)
 }
-
+/*
 var test = 8.5
 setInterval(function () {
 	UpdateOCVGraph(test, test/2);
 	test++;
 
-}, 1000);
+}, 1000);*/
 
 //TODO
 //Add UpdateGraph() -> insert new value throught websocket
-//Add CreateGraph() -> uses allData to create the main graph
+//Add InitDataGraph() -> uses allData to create the main graph
 //Add SendCommand() -> sends 'charge' or 'discharge' command to server throught websocket
 
 
