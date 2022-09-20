@@ -28,9 +28,10 @@
 				}
 			});
 		}
+		
 		//OCV graph
 		if ($("#page-view-analytic").length) {
-			var pageiVewAnalyticData = {
+			var pageiVewAnalyticDataOCV = {
 				labels: ["1", "2", "3", "4", "5", "6", "7"],
 				datasets: [{
 						label: 'OCV (V)',
@@ -67,7 +68,7 @@
 					}*/
 				],
 			};
-			var pageiVewAnalyticOptions = {
+			var pageiVewAnalyticOptionsOCV = {
 				scales: {
 					yAxes: [{
 						display: true,
@@ -129,18 +130,29 @@
 					backgroundColor: 'rgba(2, 171, 254, 1)',
 				},
 			};
-			var barChartCanvas = $("#page-view-analytic").get(0).getContext("2d");
+			var OCVGraphCanvas = $("#page-view-analytic").get(0).getContext("2d");
 			// This will get the first returned node in the jQuery collection.
-			var barChart = new Chart(barChartCanvas, {
+			var OCVGraph = new Chart(OCVGraphCanvas, {
 				type: 'line',
-				data: pageiVewAnalyticData,
-				options: pageiVewAnalyticOptions,
+				data: pageiVewAnalyticDataOCV,
+				options: pageiVewAnalyticOptionsOCV,
 			});
-			document.getElementById('pageViewAnalyticLengend').innerHTML = barChart.generateLegend();
+			document.getElementById('pageViewAnalyticLengend').innerHTML = OCVGraph.generateLegend();
+
+			function UpdateOCVGraph(newValue){
+				OCVGraph.data.datasets[0].data[0] = OCVGraph.data.datasets[0].data[0] - newValue
+				console.log(OCVGraph.data.datasets[0].data[0])
+				OCVGraph.update()
+			}
+			//setInterval(function(){
+				//OCVGraph.addData([Math.random() * 100, Math.random() * 100]);
+
+			  //}, 1000);
 		}
 		
+		//
 		if ($("#SOC-graph").length) {
-			var pageiVewAnalyticData = {
+			var pageiVewAnalyticDataSOC = {
 				labels: ["1", "2", "3", "4", "5", "6", "7"],
 				datasets: [{
 						label: 'SOC (%)',
@@ -160,7 +172,7 @@
 					}
 				],
 			};
-			var pageiVewAnalyticOptions = {
+			var pageiVewAnalyticOptionsSOC = {
 				scales: {
 					yAxes: [{
 						display: true,
@@ -222,17 +234,19 @@
 					backgroundColor: 'rgba(2, 171, 254, 1)',
 				},
 			};
-			var barChartCanvas = $("#SOC-graph").get(0).getContext("2d");
+			var SOCCanvas = $("#SOC-graph").get(0).getContext("2d");
 			// This will get the first returned node in the jQuery collection.
-			var barChart = new Chart(barChartCanvas, {
+			var SOCChart = new Chart(SOCCanvas, {
 				type: 'line',
-				data: pageiVewAnalyticData,
-				options: pageiVewAnalyticOptions,
+				data: pageiVewAnalyticDataSOC,
+				options: pageiVewAnalyticOptionsSOC,
 			});
-			document.getElementById('SOClegend').innerHTML = barChart.generateLegend();
+			document.getElementById('SOClegend').innerHTML = SOCChart.generateLegend();
 		}
+
+		//Current graph
 		if ($("#current-graph").length) {
-			var pageiVewAnalyticData = {
+			var pageiVewAnalyticDataCurrent = {
 				labels: ["1", "2", "3", "4", "5", "6", "7"],
 				datasets: [{
 						label: 'SOC (%)',
@@ -252,7 +266,7 @@
 					}
 				],
 			};
-			var pageiVewAnalyticOptions = {
+			var pageiVewAnalyticOptionsCurrent = {
 				scales: {
 					yAxes: [{
 						display: true,
@@ -314,15 +328,51 @@
 					backgroundColor: 'rgba(2, 171, 254, 1)',
 				},
 			};
-			var barChartCanvas = $("#current-graph").get(0).getContext("2d");
+			var currentGraphCanvas = $("#current-graph").get(0).getContext("2d");
 			// This will get the first returned node in the jQuery collection.
-			var barChart = new Chart(barChartCanvas, {
+			var currentGraph = new Chart(currentGraphCanvas, {
 				type: 'line',
-				data: pageiVewAnalyticData,
-				options: pageiVewAnalyticOptions,
+				data: pageiVewAnalyticDataCurrent,
+				options: pageiVewAnalyticOptionsCurrent,
 			});
-			document.getElementById('currentlegend').innerHTML = barChart.generateLegend();
+			document.getElementById('currentlegend').innerHTML = currentGraph.generateLegend();
 		}
     
 	});
 })(jQuery);
+
+//
+// WEBSOCKETS
+//
+
+//const { event } = require("jquery");
+
+
+var webSocket = new WebSocket("ws://localhost:3000/readLast");
+
+const server_URL = "http://localhost:3000/allData";
+
+//performs http request to get initial data
+fetch(server_URL)
+  .then(data => { return data.json() })
+  .then(res => { console.log(JSON.stringify(res)) })
+
+webSocket.onopen = (event) => {
+  var sendObject = {userName:"Dashboard",message:"Trying to connect"};
+  webSocket.send(JSON.stringify(sendObject));
+};
+
+webSocket.onmessage = (event) => {
+  console.log(event.data)
+}
+
+
+setInterval(function(){
+				//UpdateOCVGraph(2);
+
+			  }, 1000);
+
+//TODO
+//Add UpdateGraph() -> insert new value throught websocket
+//Add CreateGraph() -> uses allData to create the main graph
+//Add SendCommand() -> sends 'charge' or 'discharge' command to server throught websocket
