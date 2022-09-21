@@ -11,14 +11,11 @@ if ($(".dashboard-progress-1").length) {
 		}
 	});
 }
-function UpdateSOCCircle(valuePercent){
-	socCircle.circleProgress('value', valuePercent/100);
-	document.getElementById("soc-circle").textContent = valuePercent.substring(0, 5) + "%";
-}
+
 //SOH
 if ($(".dashboard-progress-2").length) {
 	var sohCircle = $('.dashboard-progress-2').circleProgress({
-		value: 0.90,
+		value: 0.74,
 		size: 125,
 		thickness: 7,
 		startAngle: Math.PI * 3 / 2,
@@ -27,9 +24,15 @@ if ($(".dashboard-progress-2").length) {
 		}
 	});
 }
-function UpdateSOHCircle(valuePercent){
-	sohCircle.circleProgress('value', valuePercent/100);
-	document.getElementById("soh-circle").textContent = valuePercent.substring(0, 5) + "%";
+function UpdateCircles(valuePercent, valuePercentSOH){
+
+	socCircle.circleProgress('value', valuePercent/100);
+	valuePercentSOH = +valuePercentSOH
+	sohCircle.circleProgress('value', valuePercentSOH/100);
+	valuePercent = String(valuePercent);
+	valuePercentSOH = String(valuePercentSOH);
+	document.getElementById("soc-circle").textContent = valuePercent.substring(0, 5) + "%";
+	document.getElementById("soh-circle").textContent = valuePercentSOH.substring(0, 5) + "%";
 }
 
 //$('.dashboard-progress-1').circleProgress({value: 0.1})
@@ -246,7 +249,7 @@ if ($("#current-graph").length) {
 	var pageiVewAnalyticDataCurrent = {
 		labels: [],
 		datasets: [{
-			label: 'SOC (%)',
+			label: 'Corrente (A)',
 			data: [],
 			backgroundColor: [
 				'rgba(216,247,234, 0.19)',
@@ -338,26 +341,23 @@ if ($("#current-graph").length) {
 // Dynamic data methods
 
 function UpdateOCVGraph(newValueX, newValueY) {
-	OCVGraph.data.labels.push(newValueX);
+	OCVGraph.data.labels.push(newValueX/1000);
 	OCVGraph.data.datasets[0].data.push(newValueY)
 	OCVGraph.update();
 }
 
 function UpdateSOCGraph(newValueX, newValueY) {
-	SOCGraph.data.labels.push(newValueX);
+	SOCGraph.data.labels.push(newValueX/1000);
 	SOCGraph.data.datasets[0].data.push(newValueY)
 	SOCGraph.update();
 }
 
 function UpdateCurrentGraph(newValueX, newValueY) {
-	currentGraph.data.labels.push(newValueX);
-	currentGraph.data.datasets[0].data.push(newValueY)
+	currentGraph.data.labels.push(newValueX/1000);
+	currentGraph.data.datasets[0].data.push(newValueY/1000)
 	currentGraph.update();
 }
 
-function UpdateSOHData(SOHData){
-	UpdateSOHCircle(SOHData[SOHData.length - 1]);
-}
 
 // Graph data initalize methods
 function InitOCVData(OCVData, timestampArr){
@@ -373,7 +373,7 @@ function InitSOCData(SOCData, timestampArr){
 		SOCGraph.data.datasets[0].data.push(element);
 		pageiVewAnalyticDataSOC.labels.push(timestampArr[index]/1000);
 	});
-	UpdateSOCCircle(SOCData[SOCData.length - 1]);
+	UpdateCircles(SOCData[SOCData.length - 1], 0);
 	SOCGraph.update();
 }
 
@@ -381,7 +381,7 @@ function InitSOCData(SOCData, timestampArr){
 
 function InitCurrentData(currentData, timestampArr){
 	currentData.forEach((element, index) => {
-		currentGraph.data.datasets[0].data.push(element);
+		currentGraph.data.datasets[0].data.push(element/1000);
 		pageiVewAnalyticDataCurrent.labels.push(timestampArr[index]/1000);
 	});
 	currentGraph.update();
@@ -420,7 +420,7 @@ fetch(SERVER_URL)
 
 		let SOHData = [];
 		SOHData = res.map((item) => item.soh);
-		UpdateSOHData(SOHData);
+		//UpdateSOHData(SOHData);
 
 		console.log(JSON.stringify(res));
 	})
@@ -431,25 +431,15 @@ webSocket.onopen = (event) => {
 };
 
 webSocket.onmessage = (event) => {
-	console.log(event.data)
+	console.log(event.data);
+	let data = JSON.parse(event.data)
+
+	if (data.timestamp != undefined){
+		let timestamp = data.timestamp;
+
+		UpdateOCVGraph(timestamp, data.ocv);
+		UpdateCurrentGraph(timestamp, data.corrente);
+		UpdateSOCGraph(timestamp, data.soc);
+		UpdateCircles(data.soc, data.soh.toFixed(2));
+	}
 }
-/*
-var test = 8.5
-setInterval(function () {
-	UpdateOCVGraph(test, test/2);
-	test++;
-
-}, 1000);*/
-
-//TODO
-//Add UpdateGraph() -> insert new value throught websocket
-//Add InitDataGraph() -> uses allData to create the main graph
-//Add SendCommand() -> sends 'charge' or 'discharge' command to server throught websocket
-
-
-
-
-
-
-
-
