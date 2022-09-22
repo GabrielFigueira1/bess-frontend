@@ -354,7 +354,7 @@ function UpdateSOCGraph(newValueX, newValueY) {
 
 function UpdateCurrentGraph(newValueX, newValueY) {
 	currentGraph.data.labels.push(newValueX/1000);
-	currentGraph.data.datasets[0].data.push(newValueY/1000)
+	currentGraph.data.datasets[0].data.push(newValueY)
 	currentGraph.update();
 }
 
@@ -381,7 +381,7 @@ function InitSOCData(SOCData, timestampArr){
 
 function InitCurrentData(currentData, timestampArr){
 	currentData.forEach((element, index) => {
-		currentGraph.data.datasets[0].data.push(element/1000);
+		currentGraph.data.datasets[0].data.push(element);
 		pageiVewAnalyticDataCurrent.labels.push(timestampArr[index]/1000);
 	});
 	currentGraph.update();
